@@ -1,3 +1,8 @@
+import streamlit as st
+import plotly.express as px
+import plotly.graph_objects as go
+import pandas as pd
+import requests
 @st.cache_data(show_spinner=False, ttl=60 * 60 * 12)
 def get_all_countries():
     """195 ta davlatni bitta fayl ichida REST Countries orqali olib keladi."""
