@@ -127,11 +127,9 @@ requests>=2.31.0
 
 ## 📸 Screenshot
 
-```md
 <p align="center">
   <img src="./assets/screenshot.png" width="800"/>
 </p>
-```
 
 ## README uchun qisqa GitHub description
 
