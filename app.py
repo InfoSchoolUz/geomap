@@ -179,14 +179,11 @@ def get_all_countries():
     """To'liq davlatlar ma'lumotlar bazasi"""
     
     countries = [
-        # O'zbekiston va Markaziy Osiyo
         {"name": "O'zbekiston", "official": "O'zbekiston Respublikasi", "cca2": "UZ", "cca3": "UZB", "flag": "🇺🇿", "capital": "Toshkent", "region": "Osiyo", "population": 34860000, "area": 447400},
         {"name": "Qozog'iston", "official": "Qozog'iston Respublikasi", "cca2": "KZ", "cca3": "KAZ", "flag": "🇰🇿", "capital": "Nur-Sulton", "region": "Osiyo", "population": 18776707, "area": 2724900},
         {"name": "Qirg'iziston", "official": "Qirg'iz Respublikasi", "cca2": "KG", "cca3": "KGZ", "flag": "🇰🇬", "capital": "Bishkek", "region": "Osiyo", "population": 6524195, "area": 199951},
         {"name": "Tojikiston", "official": "Tojikiston Respublikasi", "cca2": "TJ", "cca3": "TJK", "flag": "🇹🇯", "capital": "Dushanbe", "region": "Osiyo", "population": 9537645, "area": 143100},
         {"name": "Turkmaniston", "official": "Turkmaniston", "cca2": "TM", "cca3": "TKM", "flag": "🇹🇲", "capital": "Ashxobod", "region": "Osiyo", "population": 6031200, "area": 491210},
-        
-        # Yevropa
         {"name": "Rossiya", "official": "Rossiya Federatsiyasi", "cca2": "RU", "cca3": "RUS", "flag": "🇷🇺", "capital": "Moskva", "region": "Yevropa", "population": 146171015, "area": 17100000},
         {"name": "Germaniya", "official": "Germaniya Federativ Respublikasi", "cca2": "DE", "cca3": "DEU", "flag": "🇩🇪", "capital": "Berlin", "region": "Yevropa", "population": 83166711, "area": 357582},
         {"name": "Fransiya", "official": "Fransiya Respublikasi", "cca2": "FR", "cca3": "FRA", "flag": "🇫🇷", "capital": "Parij", "region": "Yevropa", "population": 65273511, "area": 551695},
@@ -197,8 +194,6 @@ def get_all_countries():
         {"name": "Polsha", "official": "Polsha Respublikasi", "cca2": "PL", "cca3": "POL", "flag": "🇵🇱", "capital": "Varshava", "region": "Yevropa", "population": 38386000, "area": 312696},
         {"name": "Shvetsiya", "official": "Shvetsiya Qirolligi", "cca2": "SE", "cca3": "SWE", "flag": "🇸🇪", "capital": "Stokgolm", "region": "Yevropa", "population": 10099265, "area": 450295},
         {"name": "Norvegiya", "official": "Norvegiya Qirolligi", "cca2": "NO", "cca3": "NOR", "flag": "🇳🇴", "capital": "Oslo", "region": "Yevropa", "population": 5421241, "area": 323802},
-        
-        # Osiyo
         {"name": "Xitoy", "official": "Xitoy Xalq Respublikasi", "cca2": "CN", "cca3": "CHN", "flag": "🇨🇳", "capital": "Pekin", "region": "Osiyo", "population": 1444216107, "area": 9596960},
         {"name": "Hindiston", "official": "Hindiston Respublikasi", "cca2": "IN", "cca3": "IND", "flag": "🇮🇳", "capital": "Nyu-Dehli", "region": "Osiyo", "population": 1380004385, "area": 3287263},
         {"name": "Yaponiya", "official": "Yaponiya", "cca2": "JP", "cca3": "JPN", "flag": "🇯🇵", "capital": "Tokio", "region": "Osiyo", "population": 126476461, "area": 377975},
@@ -209,22 +204,16 @@ def get_all_countries():
         {"name": "Turkiya", "official": "Turkiya Respublikasi", "cca2": "TR", "cca3": "TUR", "flag": "🇹🇷", "capital": "Ankara", "region": "Osiyo", "population": 84339067, "area": 783562},
         {"name": "Eron", "official": "Eron Islom Respublikasi", "cca2": "IR", "cca3": "IRN", "flag": "🇮🇷", "capital": "Tehron", "region": "Osiyo", "population": 83992949, "area": 1648195},
         {"name": "Saudiya Arabistoni", "official": "Saudiya Arabistoni Qirolligi", "cca2": "SA", "cca3": "SAU", "flag": "🇸🇦", "capital": "Ar-Riyod", "region": "Osiyo", "population": 34813871, "area": 2149690},
-        
-        # Amerika
         {"name": "AQSh", "official": "Amerika Qo'shma Shtatlari", "cca2": "US", "cca3": "USA", "flag": "🇺🇸", "capital": "Vashington", "region": "Amerika", "population": 331900000, "area": 9833520},
         {"name": "Kanada", "official": "Kanada", "cca2": "CA", "cca3": "CAN", "flag": "🇨🇦", "capital": "Ottava", "region": "Amerika", "population": 38246701, "area": 9984670},
         {"name": "Braziliya", "official": "Braziliya Federativ Respublikasi", "cca2": "BR", "cca3": "BRA", "flag": "🇧🇷", "capital": "Brazilia", "region": "Amerika", "population": 213993437, "area": 8515770},
         {"name": "Meksika", "official": "Meksika Qo'shma Shtatlari", "cca2": "MX", "cca3": "MEX", "flag": "🇲🇽", "capital": "Mexiko", "region": "Amerika", "population": 128932753, "area": 1964375},
         {"name": "Argentina", "official": "Argentina Respublikasi", "cca2": "AR", "cca3": "ARG", "flag": "🇦🇷", "capital": "Buenos-Ayres", "region": "Amerika", "population": 45195777, "area": 2780400},
-        
-        # Afrika
         {"name": "Nigeriya", "official": "Nigeriya Federativ Respublikasi", "cca2": "NG", "cca3": "NGA", "flag": "🇳🇬", "capital": "Abuja", "region": "Afrika", "population": 206139589, "area": 923768},
         {"name": "Misr", "official": "Misr Arab Respublikasi", "cca2": "EG", "cca3": "EGY", "flag": "🇪🇬", "capital": "Qohira", "region": "Afrika", "population": 102334404, "area": 1002450},
         {"name": "Janubiy Afrika", "official": "Janubiy Afrika Respublikasi", "cca2": "ZA", "cca3": "ZAF", "flag": "🇿🇦", "capital": "Pretoriya", "region": "Afrika", "population": 59308690, "area": 1221037},
         {"name": "Keniya", "official": "Keniya Respublikasi", "cca2": "KE", "cca3": "KEN", "flag": "🇰🇪", "capital": "Nayrobi", "region": "Afrika", "population": 53771300, "area": 580367},
         {"name": "Efiopiya", "official": "Efiopiya Federativ Demokratik Respublikasi", "cca2": "ET", "cca3": "ETH", "flag": "🇪🇹", "capital": "Addis-Abeba", "region": "Afrika", "population": 114963588, "area": 1104300},
-        
-        # Avstraliya va Okeaniya
         {"name": "Avstraliya", "official": "Avstraliya Hamdo'stligi", "cca2": "AU", "cca3": "AUS", "flag": "🇦🇺", "capital": "Kanberra", "region": "Okeaniya", "population": 25788201, "area": 7692024},
         {"name": "Yangi Zelandiya", "official": "Yangi Zelandiya", "cca2": "NZ", "cca3": "NZL", "flag": "🇳🇿", "capital": "Vellington", "region": "Okeaniya", "population": 5084300, "area": 268838},
     ]
@@ -247,7 +236,7 @@ def get_all_countries():
             'timezones': '—',
             'borders': 'Dengizga chegaralangan',
             'tld': '—',
-            'landlocked': "Yo'q" if c['name'] not in ['O\'zbekiston', 'Qozog\'iston', 'Qirg\'iziston', 'Tojikiston', 'Turkmaniston'] else "Ha",
+            'landlocked': "Yo'q" if c['name'] not in ["O'zbekiston", "Qozog'iston", "Qirg'iziston", "Tojikiston", "Turkmaniston"] else "Ha",
             'independent': 'Ha',
             'car_side': '—',
             'lat': 0,
@@ -258,11 +247,11 @@ def get_all_countries():
 
 def format_number(n):
     if n >= 1_000_000_000:
-        return f"{n/1_000_000_000:.2f} млрд"
+        return f"{n/1_000_000_000:.2f} mlrd"
     elif n >= 1_000_000:
-        return f"{n/1_000_000:.2f} млн"
+        return f"{n/1_000_000:.2f} mln"
     elif n >= 1_000:
-        return f"{n/1_000:.1f} тыс"
+        return f"{n/1_000:.1f} ming"
     return str(n)
 
 def format_money(value):
@@ -270,11 +259,11 @@ def format_money(value):
         return "—"
     value = float(value)
     if value >= 1_000_000_000_000:
-        return f"${value/1_000_000_000_000:.2f} трлн"
+        return f"${value/1_000_000_000_000:.2f} trln"
     elif value >= 1_000_000_000:
-        return f"${value/1_000_000_000:.2f} млрд"
+        return f"${value/1_000_000_000:.2f} mlrd"
     elif value >= 1_000_000:
-        return f"${value/1_000_000:.2f} млн"
+        return f"${value/1_000_000:.2f} mln"
     return f"${value:,.0f}"
 
 def format_float(value, suffix=""):
@@ -282,9 +271,6 @@ def format_float(value, suffix=""):
         return "—"
     return f"{float(value):.2f}{suffix}"
 
-# ─────────────────────────────────────────────
-#  EXTRA DATA HELPERS (NEW)
-# ─────────────────────────────────────────────
 COUNTRY_NAME_EN_MAP = {
     "O'zbekiston": "Uzbekistan",
     "Qozog'iston": "Kazakhstan",
@@ -455,7 +441,7 @@ with st.sidebar:
     <div style='font-family: Orbitron, monospace; font-size: 0.9rem; color: #00d4ff;
                 letter-spacing: 2px; padding: 0.5rem 0; border-bottom: 1px solid #1e3a5f;
                 margin-bottom: 1rem;'>
-        ⚙️ FILTERS
+        ⚙️ FILTERLAR
     </div>
     """, unsafe_allow_html=True)
 
@@ -472,9 +458,9 @@ with st.sidebar:
         
         col1, col2 = st.columns(2)
         with col1:
-            min_pop = st.number_input("Min aholi (млн)", min_value=0, max_value=int(pop_max/1_000_000), value=0)
+            min_pop = st.number_input("Min aholi (mln)", min_value=0, max_value=int(pop_max/1_000_000), value=0)
         with col2:
-            max_pop = st.number_input("Max aholi (млн)", min_value=0, max_value=int(pop_max/1_000_000), value=int(pop_max/1_000_000))
+            max_pop = st.number_input("Max aholi (mln)", min_value=0, max_value=int(pop_max/1_000_000), value=int(pop_max/1_000_000))
         
         filtered_df = filtered_df[
             (filtered_df["population"] >= min_pop * 1_000_000) &
@@ -507,10 +493,10 @@ if not filtered_df.empty:
     
     c1, c2, c3, c4 = st.columns(4)
     metrics = [
-        (c1, f"{n_countries}", "ДАВЛАТЛАР"),
-        (c2, format_number(total_pop), "ЖАМИ АҲОЛИ"),
-        (c3, f"{total_area:,.0f} км²", "ЖАМИ МАЙДОН"),
-        (c4, format_number(avg_pop), "ЎРТАЧА АҲОЛИ"),
+        (c1, f"{n_countries}", "DAVLATLAR"),
+        (c2, format_number(total_pop), "JAMI AHOLI"),
+        (c3, f"{total_area:,.0f} km²", "JAMI MAYDON"),
+        (c4, format_number(avg_pop), "O'RTACHA AHOLI"),
     ]
     
     for col, num, label in metrics:
@@ -527,7 +513,7 @@ st.markdown("<br>", unsafe_allow_html=True)
 # ─────────────────────────────────────────────
 #  TABS
 # ─────────────────────────────────────────────
-tab1, tab2 = st.tabs(["🗺️ Карта & Давлатлар", "📊 Статистика"])
+tab1, tab2 = st.tabs(["🗺️ Xarita & Davlatlar", "📊 Statistika"])
 
 with tab1:
     map_col, detail_col = st.columns([3, 2], gap="medium")
@@ -578,14 +564,14 @@ with tab1:
         st.markdown("""
         <div style='font-family: Orbitron, monospace; font-size: 0.85rem; color: #00d4ff;
                     letter-spacing: 2px; margin: 0.5rem 0;'>
-            📋 TOP 10 — АҲОЛИ СОНИ БЎЙИЧА
+            📋 TOP 10 — AHOLI SONI BO'YICHA
         </div>
         """, unsafe_allow_html=True)
         
         top10 = filtered_df.nlargest(10, "population")[["flag", "name", "capital", "region", "population", "area"]].copy()
         top10["population"] = top10["population"].apply(format_number)
-        top10["area"] = top10["area"].apply(lambda x: f"{x:,.0f} км²")
-        top10.columns = ["🏳", "Давлат", "Пойтахт", "Регион", "Аҳоли", "Майдон"]
+        top10["area"] = top10["area"].apply(lambda x: f"{x:,.0f} km²")
+        top10.columns = ["🏳", "Davlat", "Poytaxt", "Region", "Aholi", "Maydon"]
         top10 = top10.reset_index(drop=True)
         top10.index = top10.index + 1
         
@@ -595,19 +581,19 @@ with tab1:
         st.markdown("""
         <div style='font-family: Orbitron, monospace; font-size: 0.85rem; color: #00d4ff;
                     letter-spacing: 2px; margin-bottom: 0.5rem;'>
-            🔍 ДАВЛАТ ТАНЛАНГ
+            🔍 DAVLAT TANLANG
         </div>
         """, unsafe_allow_html=True)
         
-        country_names = ["— Танланг —"] + filtered_df["name"].tolist()
+        country_names = ["— Tanlang —"] + filtered_df["name"].tolist()
         selected_country = st.selectbox("", country_names, label_visibility="collapsed")
         
-        if selected_country == "— Танланг —":
+        if selected_country == "— Tanlang —":
             st.markdown("""
             <div class="no-selection">
                 <span class="emoji">🌐</span>
-                Чап тарафдаги харитани кўринг ёки<br>
-                юқоридан давлат танланг
+                Chap tarafdagi xaritani ko'ring yoki<br>
+                yuqoridan davlat tanlang
             </div>
             """, unsafe_allow_html=True)
             
@@ -656,26 +642,26 @@ with tab1:
                 st.markdown(f"""
                 <div class="metric-box">
                     <div class="metric-num">{format_number(row['population'])}</div>
-                    <div class="metric-label">АҲОЛИ</div>
+                    <div class="metric-label">AHOLI</div>
                 </div>
                 """, unsafe_allow_html=True)
             with col_b:
                 st.markdown(f"""
                 <div class="metric-box">
                     <div class="metric-num">{f"{row['area']:,.0f}"}</div>
-                    <div class="metric-label">МАЙДОН км²</div>
+                    <div class="metric-label">MAYDON km²</div>
                 </div>
                 """, unsafe_allow_html=True)
             
             details = [
-                ("🏛️ Пойтахт", row['capital']),
-                ("🌐 Регион", row['region']),
-                ("🌊 Қуруқлик давлат", row['landlocked']),
-                ("🔲 Мустақил", row['independent']),
-                ("👤 Президент", extra_data.get("president", "—")),
+                ("🏛️ Poytaxt", row['capital']),
+                ("🌐 Region", row['region']),
+                ("🌊 Quruqlik davlat", row['landlocked']),
+                ("🔲 Mustaqil", row['independent']),
+                ("👤 Prezident", extra_data.get("president", "—")),
             ]
             
-            details_html = '<div class="info-card"><h3>📡 ТЎЛИҚ МАЪЛУМОТ</h3>'
+            details_html = '<div class="info-card"><h3>📡 TO\'LIQ MA\'LUMOT</h3>'
             for label, value in details:
                 if value and value != "—":
                     details_html += f"""
@@ -689,15 +675,15 @@ with tab1:
             economy_details = [
                 ("💰 GDP", f"{format_money(extra_data.get('gdp_usd'))} ({extra_data.get('gdp_year') or '—'})"),
                 ("🧮 GDP per capita", f"{format_money(extra_data.get('gdp_per_capita'))} ({extra_data.get('gdp_pc_year') or '—'})"),
-                ("🌾 Қишлоқ хўжалиги", f"{format_float(extra_data.get('agriculture_pct'), '%')} ({extra_data.get('agriculture_year') or '—'})"),
-                ("🏭 Саноат", f"{format_float(extra_data.get('industry_pct'), '%')} ({extra_data.get('industry_year') or '—'})"),
-                ("🏢 Хизматлар", f"{format_float(extra_data.get('services_pct'), '%')} ({extra_data.get('services_year') or '—'})"),
-                ("📈 Инфляция", f"{format_float(extra_data.get('inflation_pct'), '%')} ({extra_data.get('inflation_year') or '—'})"),
-                ("❤️ Умр давомийлиги", f"{format_float(extra_data.get('life_expectancy'), ' йил')} ({extra_data.get('life_year') or '—'})"),
-                ("🏙️ Шаҳар аҳолиси", f"{format_float(extra_data.get('urban_population_pct'), '%')} ({extra_data.get('urban_year') or '—'})"),
+                ("🌾 Qishloq xo'jaligi", f"{format_float(extra_data.get('agriculture_pct'), '%')} ({extra_data.get('agriculture_year') or '—'})"),
+                ("🏭 Sanoat", f"{format_float(extra_data.get('industry_pct'), '%')} ({extra_data.get('industry_year') or '—'})"),
+                ("🏢 Xizmatlar", f"{format_float(extra_data.get('services_pct'), '%')} ({extra_data.get('services_year') or '—'})"),
+                ("📈 Inflatsiya", f"{format_float(extra_data.get('inflation_pct'), '%')} ({extra_data.get('inflation_year') or '—'})"),
+                ("❤️ Umr davomiyligi", f"{format_float(extra_data.get('life_expectancy'), ' yil')} ({extra_data.get('life_year') or '—'})"),
+                ("🏙️ Shahar aholisi", f"{format_float(extra_data.get('urban_population_pct'), '%')} ({extra_data.get('urban_year') or '—'})"),
             ]
 
-            econ_html = '<div class="info-card"><h3>📊 ИҚТИСОДИЙ СТАТИСТИКА</h3>'
+            econ_html = '<div class="info-card"><h3>📊 IQTISODIY STATISTIKA</h3>'
             for label, value in economy_details:
                 if value and value != "—":
                     econ_html += f"""
@@ -712,7 +698,7 @@ with tab2:
     st.markdown("""
     <div style='font-family: Orbitron, monospace; font-size: 1.2rem; color: #00d4ff;
                 letter-spacing: 2px; margin-bottom: 1rem;'>
-        📊 РЕГИОНЛАР СТАТИСТИКАСИ
+        📊 REGIONLAR STATISTIKASI
     </div>
     """, unsafe_allow_html=True)
     
@@ -721,18 +707,18 @@ with tab2:
         "area": "sum",
         "name": "count"
     }).round(2).reset_index()
-    region_stats.columns = ["Регион", "Аҳоли", "Майдон (км²)", "Давлатлар сони"]
-    region_stats["Аҳоли"] = region_stats["Аҳоли"].apply(format_number)
-    region_stats["Майдон (км²)"] = region_stats["Майдон (км²)"].apply(lambda x: f"{x:,.0f}")
+    region_stats.columns = ["Region", "Aholi", "Maydon (km²)", "Davlatlar soni"]
+    region_stats["Aholi"] = region_stats["Aholi"].apply(format_number)
+    region_stats["Maydon (km²)"] = region_stats["Maydon (km²)"].apply(lambda x: f"{x:,.0f}")
     
     st.dataframe(region_stats, use_container_width=True)
     
     fig_bar = px.bar(
         region_stats,
-        x="Регион",
-        y="Давлатлар сони",
-        title="РЕГИОНЛАР БЎЙИЧА ДАВЛАТЛАР СОНИ",
-        color="Давлатлар сони",
+        x="Region",
+        y="Davlatlar soni",
+        title="REGIONLAR BO'YICHA DAVLATLAR SONI",
+        color="Davlatlar soni",
         color_continuous_scale="Viridis"
     )
     fig_bar.update_layout(
