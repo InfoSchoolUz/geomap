@@ -3,19 +3,20 @@ import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
 import requests
+from datetime import datetime
 
 # ─────────────────────────────────────────────
 #  PAGE CONFIG
 # ─────────────────────────────────────────────
 st.set_page_config(
-    page_title="🌍 World Explorer",
+    page_title="🌍 World Explorer Pro",
     page_icon="🌍",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
 # ─────────────────────────────────────────────
-#  CUSTOM CSS  (dark space / neon aesthetic)
+#  CUSTOM CSS (dark space / neon aesthetic)
 # ─────────────────────────────────────────────
 st.markdown("""
 <style>
@@ -30,6 +31,9 @@ st.markdown("""
     --accent2: #7b2fff;
     --text: #c8e6ff;
     --dim: #4a7a9b;
+    --success: #00ff88;
+    --warning: #ffaa00;
+    --danger: #ff3366;
 }
 
 /* Global */
@@ -164,12 +168,24 @@ html, body, [class*="css"] {
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* Tabs */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 8px;
+}
+.stTabs [data-baseweb="tab"] {
+    background: var(--card);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.8rem;
+}
 </style>
 """, unsafe_allow_html=True)
 
 
 # ─────────────────────────────────────────────
-#  DATA LOADING
+#  DATA LOADING FUNCTIONS
 # ─────────────────────────────────────────────
 @st.cache_data(ttl=3600, show_spinner=False)
 def load_countries():
@@ -179,7 +195,6 @@ def load_countries():
         "Accept": "application/json",
     }
     try:
-        # fields parametrisiz — to'liq ma'lumot olamiz
         url = "https://restcountries.com/v3.1/all"
         r = requests.get(url, headers=headers, timeout=20)
         r.raise_for_status()
@@ -194,29 +209,25 @@ def load_countries():
                 lat = latlng[0] if len(latlng) > 0 else 0
                 lon = latlng[1] if len(latlng) > 1 else 0
 
-                # Languages
                 langs = c.get("languages", {})
                 languages = ", ".join(langs.values()) if langs else "—"
-
-                # Currencies
+                
                 curr = c.get("currencies", {})
                 currencies = ", ".join(
                     f"{v.get('name','')} ({v.get('symbol','')})"
                     for v in curr.values()
                 ) if curr else "—"
-
-                # Capital
+                
+                # ISO kodlarini olish
+                currencies_iso = list(curr.keys()) if curr else []
+                
                 capitals = c.get("capital", [])
                 capital = ", ".join(capitals) if capitals else "—"
-
-                # TLD
+                
                 tlds = c.get("tld", [])
                 tld = ", ".join(tlds) if tlds else "—"
-
-                # Borders
+                
                 borders = c.get("borders", [])
-
-                # Car side
                 car_side = c.get("car", {}).get("side", "—")
 
                 rows.append({
@@ -233,6 +244,7 @@ def load_countries():
                     "area": c.get("area", 0),
                     "languages": languages,
                     "currencies": currencies,
+                    "currencies_iso": currencies_iso,
                     "timezones": ", ".join(c.get("timezones", [])),
                     "borders_list": borders,
                     "borders": ", ".join(borders) if borders else "Dengizga yoki okean bilan chegaralangan",
@@ -248,7 +260,6 @@ def load_countries():
 
         return pd.DataFrame(rows)
     except Exception as e:
-        # v2 API ga fallback
         try:
             url2 = "https://restcountries.com/v2/all"
             r2 = requests.get(url2, headers=headers, timeout=20)
@@ -278,6 +289,7 @@ def load_countries():
                         "area": c.get("area", 0) or 0,
                         "languages": languages,
                         "currencies": currencies,
+                        "currencies_iso": [],
                         "timezones": ", ".join(c.get("timezones", [])),
                         "borders_list": c.get("borders", []),
                         "borders": ", ".join(c.get("borders", [])) or "Dengizga chegaralangan",
@@ -296,28 +308,63 @@ def load_countries():
             st.error(f"Ikkala API ham ishlamadi: {e} | {e2}")
             return pd.DataFrame()
 
+@st.cache_data(ttl=1800, show_spinner=False)
+def load_covid_stats():
+    """Disease.sh API dan COVID-19 statistikasi"""
+    try:
+        url = "https://disease.sh/v3/covid-19/countries"
+        r = requests.get(url, timeout=15)
+        r.raise_for_status()
+        data = r.json()
+        
+        covid_df = pd.DataFrame(data)
+        covid_df = covid_df[['country', 'cases', 'deaths', 'recovered', 'active', 'critical', 'todayCases', 'todayDeaths']]
+        covid_df.columns = ['country', 'COVID Cases', 'Deaths', 'Recovered', 'Active', 'Critical', 'Today Cases', 'Today Deaths']
+        
+        return covid_df
+    except Exception as e:
+        st.warning(f"COVID-19 ma'lumotlarini yuklab bo'lmadi: {e}")
+        return pd.DataFrame()
+
+@st.cache_data(ttl=3600, show_spinner=False)
+def load_exchange_rates():
+    """Open Exchange Rates API (free tier) - valyuta kurslari"""
+    try:
+        # Free API - demo endpoint
+        url = "https://open.er-api.com/v6/latest/USD"
+        r = requests.get(url, timeout=15)
+        r.raise_for_status()
+        data = r.json()
+        
+        rates = data.get('rates', {})
+        return rates
+    except Exception as e:
+        st.warning(f"Valyuta kurslarini yuklab bo'lmadi: {e}")
+        return {}
 
 def format_number(n):
     if n >= 1_000_000_000:
-        return f"{n/1_000_000_000:.2f} mlrd"
+        return f"{n/1_000_000_000:.2f} млрд"
     elif n >= 1_000_000:
-        return f"{n/1_000_000:.2f} mln"
+        return f"{n/1_000_000:.2f} млн"
     elif n >= 1_000:
-        return f"{n/1_000:.1f} ming"
+        return f"{n/1_000:.1f} тыс"
     return str(n)
 
 
 # ─────────────────────────────────────────────
 #  HEADER
 # ─────────────────────────────────────────────
-st.markdown('<div class="main-title">🌍 WORLD EXPLORER</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-title">INTERACTIVE GLOBAL COUNTRIES INTELLIGENCE PLATFORM</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-title">🌍 WORLD EXPLORER PRO</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-title">INTERACTIVE GLOBAL COUNTRIES INTELLIGENCE PLATFORM + COVID-19 + EXCHANGE RATES</div>', unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────
 #  LOAD DATA
 # ─────────────────────────────────────────────
 with st.spinner("🛰️ Dunyo ma'lumotlari yuklanmoqda..."):
     df = load_countries()
+    covid_df = load_covid_stats()
+    exchange_rates = load_exchange_rates()
 
 if df.empty:
     st.error("Ma'lumotlar yuklanmadi. Internet aloqasini tekshiring.")
@@ -356,7 +403,7 @@ with st.sidebar:
     # Population filter
     pop_min, pop_max = int(df["population"].min()), int(df["population"].max())
     pop_range = st.slider(
-        "👥 Aholi (mln)",
+        "👥 Aholi (млн)",
         min_value=0,
         max_value=int(pop_max / 1_000_000) + 1,
         value=(0, int(pop_max / 1_000_000) + 1),
@@ -391,12 +438,19 @@ total_area = filtered_df["area"].sum()
 n_countries = len(filtered_df)
 n_landlocked = (filtered_df["landlocked"] == "Ha").sum()
 
-c1, c2, c3, c4 = st.columns(4)
+# COVID global stats
+if not covid_df.empty:
+    global_cases = covid_df['COVID Cases'].sum()
+    global_deaths = covid_df['Deaths'].sum()
+    global_recovered = covid_df['Recovered'].sum()
+
+c1, c2, c3, c4, c5 = st.columns(5)
 for col, num, label in [
-    (c1, f"{n_countries}", "DAVLATLAR"),
-    (c2, format_number(total_pop), "JAMI AHOLI"),
-    (c3, f"{total_area:,.0f} km²", "JAMI MAYDON"),
-    (c4, f"{n_landlocked}", "QURUQLIK DAVLAT"),
+    (c1, f"{n_countries}", "ДАВЛАТЛАР"),
+    (c2, format_number(total_pop), "ЖАМИ АҲОЛИ"),
+    (c3, f"{total_area:,.0f} км²", "ЖАМИ МАЙДОН"),
+    (c4, f"{n_landlocked}", "ҚУРУҚЛИК ДАВЛАТ"),
+    (c5, f"{format_number(global_cases) if not covid_df.empty else '—'}", "ЖАҲОН COVID-19"),
 ]:
     with col:
         st.markdown(f"""
@@ -409,215 +463,46 @@ for col, num, label in [
 st.markdown("<br>", unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────
-#  MAIN LAYOUT: Map | Detail
+#  TABS FOR DIFFERENT VIEWS
 # ─────────────────────────────────────────────
-map_col, detail_col = st.columns([3, 2], gap="medium")
+tab1, tab2, tab3 = st.tabs(["🗺️ Карта & Давлатлар", "🦠 COVID-19 Статистикаси", "💰 Валюта Курслари"])
 
-with map_col:
-    # ── CHOROPLETH MAP ──
-    fig = px.choropleth(
-        filtered_df,
-        locations="cca3",
-        color=color_by,
-        hover_name="name",
-        hover_data={
-            "cca3": False,
-            "capital": True,
-            "region": True,
-            "population": ":,",
-            "area": ":,.0f",
-        },
-        color_continuous_scale=[
-            [0, "#0d1b2e"],
-            [0.2, "#0a3060"],
-            [0.5, "#0066cc"],
-            [0.8, "#00aaff"],
-            [1, "#00d4ff"],
-        ],
-        projection="natural earth",
-        labels={
-            "population": "Aholi",
-            "area": "Maydon km²",
-            "capital": "Poytaxt",
-            "region": "Region",
-        },
-    )
+with tab1:
+    map_col, detail_col = st.columns([3, 2], gap="medium")
+    
+    with map_col:
+        # ── CHOROPLETH MAP ──
+        fig = px.choropleth(
+            filtered_df,
+            locations="cca3",
+            color=color_by,
+            hover_name="name",
+            hover_data={
+                "cca3": False,
+                "capital": True,
+                "region": True,
+                "population": ":,",
+                "area": ":,.0f",
+            },
+            color_continuous_scale=[
+                [0, "#0d1b2e"],
+                [0.2, "#0a3060"],
+                [0.5, "#0066cc"],
+                [0.8, "#00aaff"],
+                [1, "#00d4ff"],
+            ],
+            projection="natural earth",
+            labels={
+                "population": "Аҳоли",
+                "area": "Майдон км²",
+                "capital": "Пойтахт",
+                "region": "Регион",
+            },
+        )
 
-    fig.update_layout(
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-        geo=dict(
-            bgcolor="rgba(5,11,26,1)",
-            showframe=False,
-            showcoastlines=True,
-            coastlinecolor="#1e3a5f",
-            showland=True,
-            landcolor="#0d1b2e",
-            showocean=True,
-            oceancolor="#030d1a",
-            showlakes=True,
-            lakecolor="#030d1a",
-            showcountries=True,
-            countrycolor="#1e3a5f",
-        ),
-        margin=dict(l=0, r=0, t=0, b=0),
-        height=420,
-        coloraxis_colorbar=dict(
-            title=dict(text="", side="right"),
-            tickfont=dict(color="#4a7a9b", size=10),
-            bgcolor="rgba(0,0,0,0)",
-            bordercolor="rgba(0,0,0,0)",
-        ),
-        font=dict(color="#c8e6ff"),
-    )
-    st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
-
-    # ── TOP 10 TABLE ──
-    st.markdown("""
-    <div style='font-family: Orbitron, monospace; font-size: 0.85rem; color: #00d4ff;
-                letter-spacing: 2px; margin: 0.5rem 0;'>
-        📋 TOP 10 — AHOLI SONI BO'YICHA
-    </div>
-    """, unsafe_allow_html=True)
-
-    top10 = filtered_df.nlargest(10, "population")[
-        ["flag", "name", "capital", "region", "population", "area"]
-    ].copy()
-    top10["population"] = top10["population"].apply(format_number)
-    top10["area"] = top10["area"].apply(lambda x: f"{x:,.0f} km²")
-    top10.columns = ["🏳", "Davlat", "Poytaxt", "Region", "Aholi", "Maydon"]
-    top10 = top10.reset_index(drop=True)
-    top10.index = top10.index + 1
-
-    st.dataframe(
-        top10,
-        use_container_width=True,
-        height=280,
-    )
-
-with detail_col:
-    # ── COUNTRY SELECTOR ──
-    st.markdown("""
-    <div style='font-family: Orbitron, monospace; font-size: 0.85rem; color: #00d4ff;
-                letter-spacing: 2px; margin-bottom: 0.5rem;'>
-        🔍 DAVLAT TANLANG
-    </div>
-    """, unsafe_allow_html=True)
-
-    country_names = ["— Tanlang —"] + filtered_df["name"].tolist()
-    selected_country = st.selectbox("", country_names, label_visibility="collapsed")
-
-    if selected_country == "— Tanlang —":
-        st.markdown("""
-        <div class="no-selection">
-            <span class="emoji">🌐</span>
-            Chap tarafdagi xaritani ko'ring yoki<br>
-            yuqoridan davlat tanlang
-        </div>
-        """, unsafe_allow_html=True)
-
-        # Region breakdown pie
-        if not filtered_df.empty:
-            region_counts = filtered_df.groupby("region")["population"].sum().reset_index()
-            pie = px.pie(
-                region_counts,
-                values="population",
-                names="region",
-                hole=0.55,
-                color_discrete_sequence=["#00d4ff", "#7b2fff", "#00ffaa", "#ff6b35", "#ffd700", "#ff4488"],
-            )
-            pie.update_layout(
-                paper_bgcolor="rgba(0,0,0,0)",
-                plot_bgcolor="rgba(0,0,0,0)",
-                font=dict(color="#c8e6ff", size=11),
-                showlegend=True,
-                legend=dict(
-                    bgcolor="rgba(0,0,0,0)",
-                    font=dict(color="#c8e6ff"),
-                    orientation="v",
-                ),
-                margin=dict(l=10, r=10, t=10, b=10),
-                height=300,
-            )
-            pie.update_traces(textfont_color="white", textinfo="percent")
-            st.markdown("""
-            <div style='font-family: Orbitron, monospace; font-size: 0.75rem; color: #4a7a9b;
-                        letter-spacing: 2px; text-align:center; margin-top: 1rem;'>
-                REGIONLAR BO'YICHA AHOLI
-            </div>
-            """, unsafe_allow_html=True)
-            st.plotly_chart(pie, use_container_width=True, config={"displayModeBar": False})
-
-    else:
-        # ── COUNTRY DETAIL ──
-        row = filtered_df[filtered_df["name"] == selected_country].iloc[0]
-
-        # Flag + name
-        st.markdown(f"""
-        <div class="info-card">
-            <div class="flag-display">{row['flag']}</div>
-            <div class="country-name">{row['name'].upper()}</div>
-            <div class="country-official">{row['official']}</div>
-        </div>
-        """, unsafe_allow_html=True)
-
-        # Key metrics
-        col_a, col_b = st.columns(2)
-        with col_a:
-            st.markdown(f"""
-            <div class="metric-box">
-                <div class="metric-num">{format_number(row['population'])}</div>
-                <div class="metric-label">AHOLI</div>
-            </div>
-            """, unsafe_allow_html=True)
-        with col_b:
-            st.markdown(f"""
-            <div class="metric-box">
-                <div class="metric-num">{f"{row['area']:,.0f}"}</div>
-                <div class="metric-label">MAYDON km²</div>
-            </div>
-            """, unsafe_allow_html=True)
-
-        # Details card
-        details = [
-            ("🏛️ Poytaxt", row["capital"]),
-            ("🌐 Region", row["region"]),
-            ("📍 Subregion", row["subregion"]),
-            ("🗣️ Tillar", row["languages"]),
-            ("💰 Valyuta", row["currencies"]),
-            ("🕐 Vaqt zonasi", row["timezones"][:40] + "..." if len(row["timezones"]) > 40 else row["timezones"]),
-            ("🌊 Quruqlik davlat", row["landlocked"]),
-            ("🚗 Yo'l tomoni", row["car_side"]),
-            ("🌐 TLD (domen)", row["tld"]),
-            ("🔲 Mustaqil", row["independent"]),
-            ("🗺️ Qo'shni davlatlar", row["borders"] if row["borders"] else "—"),
-        ]
-
-        details_html = '<div class="info-card"><h3>📡 TO\'LIQ MA\'LUMOT</h3>'
-        for label, value in details:
-            details_html += f"""
-            <div class="stat-row">
-                <span class="stat-label">{label}</span>
-                <span class="stat-value" style="max-width:55%; text-align:right; font-size:0.82rem;">{value}</span>
-            </div>"""
-        details_html += "</div>"
-        st.markdown(details_html, unsafe_allow_html=True)
-
-        # Mini map for selected country
-        mini_fig = go.Figure(go.Scattergeo(
-            lat=[row["lat"]],
-            lon=[row["lon"]],
-            mode="markers",
-            marker=dict(
-                size=18,
-                color="#00d4ff",
-                symbol="circle",
-                line=dict(width=3, color="#7b2fff"),
-            ),
-            text=[row["name"]],
-            hovertemplate=f"<b>{row['name']}</b><br>Lat: {row['lat']:.2f}<br>Lon: {row['lon']:.2f}<extra></extra>",
-        ))
-        mini_fig.update_layout(
+        fig.update_layout(
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
             geo=dict(
                 bgcolor="rgba(5,11,26,1)",
                 showframe=False,
@@ -627,23 +512,287 @@ with detail_col:
                 landcolor="#0d1b2e",
                 showocean=True,
                 oceancolor="#030d1a",
+                showlakes=True,
+                lakecolor="#030d1a",
                 showcountries=True,
                 countrycolor="#1e3a5f",
-                projection_type="orthographic",
-                center=dict(lat=row["lat"], lon=row["lon"]),
             ),
-            paper_bgcolor="rgba(0,0,0,0)",
             margin=dict(l=0, r=0, t=0, b=0),
-            height=200,
-            showlegend=False,
+            height=420,
+            coloraxis_colorbar=dict(
+                title=dict(text="", side="right"),
+                tickfont=dict(color="#4a7a9b", size=10),
+                bgcolor="rgba(0,0,0,0)",
+                bordercolor="rgba(0,0,0,0)",
+            ),
+            font=dict(color="#c8e6ff"),
         )
+        st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+
+        # ── TOP 10 TABLE ──
         st.markdown("""
-        <div style='font-family: Orbitron, monospace; font-size: 0.75rem; color: #4a7a9b;
-                    letter-spacing: 2px; text-align:center; margin-top:0.5rem;'>
-            🌐 GLOBUS JOYLASHUVI
+        <div style='font-family: Orbitron, monospace; font-size: 0.85rem; color: #00d4ff;
+                    letter-spacing: 2px; margin: 0.5rem 0;'>
+            📋 TOP 10 — АҲОЛИ СОНИ БЎЙИЧА
         </div>
         """, unsafe_allow_html=True)
-        st.plotly_chart(mini_fig, use_container_width=True, config={"displayModeBar": False})
+
+        top10 = filtered_df.nlargest(10, "population")[
+            ["flag", "name", "capital", "region", "population", "area"]
+        ].copy()
+        top10["population"] = top10["population"].apply(format_number)
+        top10["area"] = top10["area"].apply(lambda x: f"{x:,.0f} км²")
+        top10.columns = ["🏳", "Давлат", "Пойтахт", "Регион", "Аҳоли", "Майдон"]
+        top10 = top10.reset_index(drop=True)
+        top10.index = top10.index + 1
+
+        st.dataframe(
+            top10,
+            use_container_width=True,
+            height=280,
+        )
+    
+    with detail_col:
+        # ── COUNTRY SELECTOR ──
+        st.markdown("""
+        <div style='font-family: Orbitron, monospace; font-size: 0.85rem; color: #00d4ff;
+                    letter-spacing: 2px; margin-bottom: 0.5rem;'>
+            🔍 ДАВЛАТ ТАНЛАНГ
+        </div>
+        """, unsafe_allow_html=True)
+
+        country_names = ["— Танланг —"] + filtered_df["name"].tolist()
+        selected_country = st.selectbox("", country_names, label_visibility="collapsed")
+
+        if selected_country == "— Танланг —":
+            st.markdown("""
+            <div class="no-selection">
+                <span class="emoji">🌐</span>
+                Чап тарафдаги харитани кўринг ёки<br>
+                юқоридан давлат танланг
+            </div>
+            """, unsafe_allow_html=True)
+
+            # Region breakdown pie
+            if not filtered_df.empty:
+                region_counts = filtered_df.groupby("region")["population"].sum().reset_index()
+                pie = px.pie(
+                    region_counts,
+                    values="population",
+                    names="region",
+                    hole=0.55,
+                    color_discrete_sequence=["#00d4ff", "#7b2fff", "#00ffaa", "#ff6b35", "#ffd700", "#ff4488"],
+                )
+                pie.update_layout(
+                    paper_bgcolor="rgba(0,0,0,0)",
+                    plot_bgcolor="rgba(0,0,0,0)",
+                    font=dict(color="#c8e6ff", size=11),
+                    showlegend=True,
+                    legend=dict(
+                        bgcolor="rgba(0,0,0,0)",
+                        font=dict(color="#c8e6ff"),
+                        orientation="v",
+                    ),
+                    margin=dict(l=10, r=10, t=10, b=10),
+                    height=300,
+                )
+                pie.update_traces(textfont_color="white", textinfo="percent")
+                st.markdown("""
+                <div style='font-family: Orbitron, monospace; font-size: 0.75rem; color: #4a7a9b;
+                            letter-spacing: 2px; text-align:center; margin-top: 1rem;'>
+                    РЕГИОНЛАР БЎЙИЧА АҲОЛИ
+                </div>
+                """, unsafe_allow_html=True)
+                st.plotly_chart(pie, use_container_width=True, config={"displayModeBar": False})
+
+        else:
+            # ── COUNTRY DETAIL ──
+            row = filtered_df[filtered_df["name"] == selected_country].iloc[0]
+
+            # Flag + name
+            st.markdown(f"""
+            <div class="info-card">
+                <div class="flag-display">{row['flag']}</div>
+                <div class="country-name">{row['name'].upper()}</div>
+                <div class="country-official">{row['official']}</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+            # Key metrics
+            col_a, col_b = st.columns(2)
+            with col_a:
+                st.markdown(f"""
+                <div class="metric-box">
+                    <div class="metric-num">{format_number(row['population'])}</div>
+                    <div class="metric-label">АҲОЛИ</div>
+                </div>
+                """, unsafe_allow_html=True)
+            with col_b:
+                st.markdown(f"""
+                <div class="metric-box">
+                    <div class="metric-num">{f"{row['area']:,.0f}"}</div>
+                    <div class="metric-label">МАЙДОН км²</div>
+                </div>
+                """, unsafe_allow_html=True)
+
+            # Details card
+            details = [
+                ("🏛️ Пойтахт", row["capital"]),
+                ("🌐 Регион", row["region"]),
+                ("📍 Субрегион", row["subregion"]),
+                ("🗣️ Тиллар", row["languages"]),
+                ("💰 Валюта", row["currencies"]),
+                ("🕐 Вакт зонаси", row["timezones"][:40] + "..." if len(row["timezones"]) > 40 else row["timezones"]),
+                ("🌊 Қуруқлик давлат", row["landlocked"]),
+                ("🚗 Йўл томони", row["car_side"]),
+                ("🌐 TLD (домен)", row["tld"]),
+                ("🔲 Мустақил", row["independent"]),
+                ("🗺️ Қўшни давлатлар", row["borders"] if row["borders"] else "—"),
+            ]
+
+            details_html = '<div class="info-card"><h3>📡 ТЎЛИҚ МАЪЛУМОТ</h3>'
+            for label, value in details:
+                details_html += f"""
+                <div class="stat-row">
+                    <span class="stat-label">{label}</span>
+                    <span class="stat-value" style="max-width:55%; text-align:right; font-size:0.82rem;">{value}</span>
+                </div>"""
+            details_html += "</div>"
+            st.markdown(details_html, unsafe_allow_html=True)
+
+            # Mini map for selected country
+            mini_fig = go.Figure(go.Scattergeo(
+                lat=[row["lat"]],
+                lon=[row["lon"]],
+                mode="markers",
+                marker=dict(
+                    size=18,
+                    color="#00d4ff",
+                    symbol="circle",
+                    line=dict(width=3, color="#7b2fff"),
+                ),
+                text=[row["name"]],
+                hovertemplate=f"<b>{row['name']}</b><br>Lat: {row['lat']:.2f}<br>Lon: {row['lon']:.2f}<extra></extra>",
+            ))
+            mini_fig.update_layout(
+                geo=dict(
+                    bgcolor="rgba(5,11,26,1)",
+                    showframe=False,
+                    showcoastlines=True,
+                    coastlinecolor="#1e3a5f",
+                    showland=True,
+                    landcolor="#0d1b2e",
+                    showocean=True,
+                    oceancolor="#030d1a",
+                    showcountries=True,
+                    countrycolor="#1e3a5f",
+                    projection_type="orthographic",
+                    center=dict(lat=row["lat"], lon=row["lon"]),
+                ),
+                paper_bgcolor="rgba(0,0,0,0)",
+                margin=dict(l=0, r=0, t=0, b=0),
+                height=200,
+                showlegend=False,
+            )
+            st.markdown("""
+            <div style='font-family: Orbitron, monospace; font-size: 0.75rem; color: #4a7a9b;
+                        letter-spacing: 2px; text-align:center; margin-top:0.5rem;'>
+                🌐 ГЛОБУС ЖОЙЛАШУВИ
+            </div>
+            """, unsafe_allow_html=True)
+            st.plotly_chart(mini_fig, use_container_width=True, config={"displayModeBar": False})
+
+with tab2:
+    if not covid_df.empty:
+        st.markdown("""
+        <div style='font-family: Orbitron, monospace; font-size: 1.2rem; color: #00d4ff;
+                    letter-spacing: 2px; margin-bottom: 1rem;'>
+            🦠 ДУНЁ БЎЙИЧА COVID-19 СТАТИСТИКАСИ
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Global COVID metrics
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("📊 Жами касалланган", f"{global_cases:,}", delta=None)
+        with col2:
+            st.metric("💀 Вафот этганлар", f"{global_deaths:,}", delta=None)
+        with col3:
+            st.metric("❤️‍🩹 Тузалганлар", f"{global_recovered:,}", delta=None)
+        with col4:
+            active_percent = (global_cases - global_recovered - global_deaths) / global_cases * 100 if global_cases > 0 else 0
+            st.metric("🟡 Фаол касаллар", f"{(global_cases - global_recovered - global_deaths):,}", delta=f"{active_percent:.1f}%")
+        
+        # Top COVID affected countries
+        st.markdown("---")
+        top_covid = covid_df.nlargest(10, 'COVID Cases')[['country', 'COVID Cases', 'Deaths', 'Recovered', 'Active']]
+        top_covid.columns = ['Давлат', 'Касалланган', 'Вафот', 'Тузалган', 'Фаол']
+        st.dataframe(top_covid, use_container_width=True)
+        
+        # COVID Bar chart
+        fig_covid = px.bar(
+            covid_df.nlargest(15, 'COVID Cases'),
+            x='country',
+            y='COVID Cases',
+            title="ТОП-15 КЎП КАСАЛЛАНГАН ДАВЛАТЛАР",
+            color='COVID Cases',
+            color_continuous_scale='Reds',
+            labels={'country': 'Давлат', 'COVID Cases': 'Касалланганлар сони'}
+        )
+        fig_covid.update_layout(
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            font=dict(color="#c8e6ff"),
+            title_font=dict(color="#00d4ff"),
+            xaxis=dict(tickangle=45)
+        )
+        st.plotly_chart(fig_covid, use_container_width=True)
+    else:
+        st.info("COVID-19 маълумотлари ҳозирча мавжуд эмас")
+
+with tab3:
+    if exchange_rates:
+        st.markdown("""
+        <div style='font-family: Orbitron, monospace; font-size: 1.2rem; color: #00d4ff;
+                    letter-spacing: 2px; margin-bottom: 1rem;'>
+            💱 ВАЛЮТА КУРСЛАРИ (USD га нисбатан)
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Convert to DataFrame for display
+        rates_df = pd.DataFrame(list(exchange_rates.items()), columns=['Валюта', 'Курс'])
+        rates_df = rates_df.sort_values('Курс', ascending=False)
+        
+        # Show top 20 strongest currencies
+        st.markdown("### 💪 Энг кучли валюталар")
+        st.dataframe(rates_df.head(20), use_container_width=True)
+        
+        # Currency search
+        search_currency = st.text_input("🔍 Валюта қидириш (масалан: UZS, EUR, GBP)", value="UZS")
+        if search_currency.upper() in exchange_rates:
+            st.success(f"1 USD = {exchange_rates[search_currency.upper()]:,.2f} {search_currency.upper()}")
+        elif search_currency:
+            st.warning(f"'{search_currency}' валютаси топилмади")
+        
+        # Exchange rate chart
+        fig_rates = px.bar(
+            rates_df.head(20),
+            x='Валюта',
+            y='Курс',
+            title="ЭНГ КУЧЛИ 20 ВАЛЮТА",
+            color='Курс',
+            color_continuous_scale='Greens'
+        )
+        fig_rates.update_layout(
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            font=dict(color="#c8e6ff"),
+            title_font=dict(color="#00d4ff"),
+            xaxis=dict(tickangle=45)
+        )
+        st.plotly_chart(fig_rates, use_container_width=True)
+    else:
+        st.info("Валюта курслари маълумотлари ҳозирча мавжуд эмас")
 
 # ─────────────────────────────────────────────
 #  FOOTER
@@ -652,6 +801,7 @@ st.markdown("<br>", unsafe_allow_html=True)
 st.markdown("""
 <div style='text-align:center; color: #1e3a5f; font-size: 0.8rem; letter-spacing: 2px;
             border-top: 1px solid #0d1b2e; padding-top: 1rem;'>
-    🛰️ DATA: REST Countries API &nbsp;|&nbsp; 🌍 WORLD EXPLORER &nbsp;|&nbsp; Built with Streamlit + Plotly
+    🛰️ DATA: REST Countries API | Disease.sh COVID-19 API | Open Exchange Rates API<br>
+    🌍 WORLD EXPLORER PRO | Built with Streamlit + Plotly
 </div>
 """, unsafe_allow_html=True)
