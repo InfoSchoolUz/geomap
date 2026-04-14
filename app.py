@@ -8,7 +8,7 @@ import requests
 #  PAGE CONFIG
 # ─────────────────────────────────────────────
 st.set_page_config(
-    page_title="🌍 World Explorer Pro",
+    page_title="World Explorer Pro",
     page_icon="🌍",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -348,11 +348,11 @@ def get_all_countries():
 
 def format_number(n):
     if n >= 1_000_000_000:
-        return f"{n/1_000_000_000:.2f} млрд"
+        return f"{n/1_000_000_000:.2f} mlrd"
     elif n >= 1_000_000:
-        return f"{n/1_000_000:.2f} млн"
+        return f"{n/1_000_000:.2f} mln"
     elif n >= 1_000:
-        return f"{n/1_000:.1f} тыс"
+        return f"{n/1_000:.1f} ming"
     return str(n)
 
 def format_money(value):
@@ -360,11 +360,11 @@ def format_money(value):
         return "—"
     value = float(value)
     if value >= 1_000_000_000_000:
-        return f"${value/1_000_000_000_000:.2f} трлн"
+        return f"${value/1_000_000_000_000:.2f} trln"
     elif value >= 1_000_000_000:
-        return f"${value/1_000_000_000:.2f} млрд"
+        return f"${value/1_000_000_000:.2f} mlrd"
     elif value >= 1_000_000:
-        return f"${value/1_000_000:.2f} млн"
+        return f"${value/1_000_000:.2f} mln"
     return f"${value:,.0f}"
 
 def format_float(value, suffix=""):
@@ -547,7 +547,7 @@ with st.sidebar:
     <div style='font-family: Orbitron, monospace; font-size: 0.9rem; color: #00d4ff;
                 letter-spacing: 2px; padding: 0.5rem 0; border-bottom: 1px solid #1e3a5f;
                 margin-bottom: 1rem;'>
-        ⚙️ FILTERS
+        ⚙️ FILTERLAR
     </div>
     """, unsafe_allow_html=True)
 
@@ -564,9 +564,9 @@ with st.sidebar:
         
         col1, col2 = st.columns(2)
         with col1:
-            min_pop = st.number_input("Min aholi (млн)", min_value=0, max_value=int(pop_max/1_000_000), value=0)
+            min_pop = st.number_input("Min aholi (mln)", min_value=0, max_value=int(pop_max/1_000_000), value=0)
         with col2:
-            max_pop = st.number_input("Max aholi (млн)", min_value=0, max_value=int(pop_max/1_000_000), value=int(pop_max/1_000_000))
+            max_pop = st.number_input("Max aholi (mln)", min_value=0, max_value=int(pop_max/1_000_000), value=int(pop_max/1_000_000))
         
         filtered_df = filtered_df[
             (filtered_df["population"] >= min_pop * 1_000_000) &
@@ -599,10 +599,10 @@ if not filtered_df.empty:
     
     c1, c2, c3, c4 = st.columns(4)
     metrics = [
-        (c1, f"{n_countries}", "ДАВЛАТЛАР"),
-        (c2, format_number(total_pop), "ЖАМИ АҲОЛИ"),
-        (c3, f"{total_area:,.0f} км²", "ЖАМИ МАЙДОН"),
-        (c4, format_number(avg_pop), "ЎРТАЧА АҲОЛИ"),
+        (c1, f"{n_countries}", "DAVLATLAR"),
+        (c2, format_number(total_pop), "JAMI AHOLI"),
+        (c3, f"{total_area:,.0f} km²", "JAMI MAYDON"),
+        (c4, format_number(avg_pop), "O'RTACHA AHOLI"),
     ]
     
     for col, num, label in metrics:
@@ -619,7 +619,7 @@ st.markdown("<br>", unsafe_allow_html=True)
 # ─────────────────────────────────────────────
 #  TABS
 # ─────────────────────────────────────────────
-tab1, tab2 = st.tabs(["🗺️ Карта & Давлатлар", "📊 Статистика"])
+tab1, tab2 = st.tabs(["🗺️ Xarita & Davlatlar", "📊 Statistika"])
 
 with tab1:
     map_col, detail_col = st.columns([3, 2], gap="medium")
@@ -670,14 +670,14 @@ with tab1:
         st.markdown("""
         <div style='font-family: Orbitron, monospace; font-size: 0.85rem; color: #00d4ff;
                     letter-spacing: 2px; margin: 0.5rem 0;'>
-            📋 TOP 10 — АҲОЛИ СОНИ БЎЙИЧА
+            📋 TOP 10 — AHOLI SONI BO'YICHA
         </div>
         """, unsafe_allow_html=True)
         
         top10 = filtered_df.nlargest(10, "population")[["flag", "name", "capital", "region", "population", "area"]].copy()
         top10["population"] = top10["population"].apply(format_number)
-        top10["area"] = top10["area"].apply(lambda x: f"{x:,.0f} км²")
-        top10.columns = ["🏳", "Давлат", "Пойтахт", "Регион", "Аҳоли", "Майдон"]
+        top10["area"] = top10["area"].apply(lambda x: f"{x:,.0f} km²")
+        top10.columns = ["🏳", "Davlat", "Poytaxt", "Region", "Aholi", "Maydon"]
         top10 = top10.reset_index(drop=True)
         top10.index = top10.index + 1
         
@@ -687,19 +687,19 @@ with tab1:
         st.markdown("""
         <div style='font-family: Orbitron, monospace; font-size: 0.85rem; color: #00d4ff;
                     letter-spacing: 2px; margin-bottom: 0.5rem;'>
-            🔍 ДАВЛАТ ТАНЛАНГ
+            🔍 DAVLAT TANLANG
         </div>
         """, unsafe_allow_html=True)
         
-        country_names = ["— Танланг —"] + filtered_df["name"].tolist()
+        country_names = ["— Tanlang —"] + filtered_df["name"].tolist()
         selected_country = st.selectbox("", country_names, label_visibility="collapsed")
         
-        if selected_country == "— Танланг —":
+        if selected_country == "— Tanlang —":
             st.markdown("""
             <div class="no-selection">
                 <span class="emoji">🌐</span>
-                Чап тарафдаги харитани кўринг ёки<br>
-                юқоридан давлат танланг
+                Chap tarafdagi xaritani ko'ring yoki<br>
+                yuqoridan davlat tanlang
             </div>
             """, unsafe_allow_html=True)
             
@@ -748,26 +748,26 @@ with tab1:
                 st.markdown(f"""
                 <div class="metric-box">
                     <div class="metric-num">{format_number(row['population'])}</div>
-                    <div class="metric-label">АҲОЛИ</div>
+                    <div class="metric-label">AHOLI</div>
                 </div>
                 """, unsafe_allow_html=True)
             with col_b:
                 st.markdown(f"""
                 <div class="metric-box">
                     <div class="metric-num">{f"{row['area']:,.0f}"}</div>
-                    <div class="metric-label">МАЙДОН км²</div>
+                    <div class="metric-label">MAYDON km²</div>
                 </div>
                 """, unsafe_allow_html=True)
             
             details = [
-                ("🏛️ Пойтахт", row['capital']),
-                ("🌐 Регион", row['region']),
-                ("🌊 Қуруқлик давлат", row['landlocked']),
-                ("🔲 Мустақил", row['independent']),
-                ("👤 Президент", extra_data.get("president", "—")),
+                ("🏛️ Poytaxt", row['capital']),
+                ("🌐 Region", row['region']),
+                ("🌊 Quruqlik davlat", row['landlocked']),
+                ("🔲 Mustaqil", row['independent']),
+                ("👤 Prezident", extra_data.get("president", "—")),
             ]
             
-            details_html = '<div class="info-card"><h3>📡 ТЎЛИҚ МАЪЛУМОТ</h3>'
+            details_html = '<div class="info-card"><h3>📡 TO\'LIQ MA\'LUMOT</h3>'
             for label, value in details:
                 if value and value != "—":
                     details_html += f"""
@@ -781,15 +781,15 @@ with tab1:
             economy_details = [
                 ("💰 GDP", f"{format_money(extra_data.get('gdp_usd'))} ({extra_data.get('gdp_year') or '—'})"),
                 ("🧮 GDP per capita", f"{format_money(extra_data.get('gdp_per_capita'))} ({extra_data.get('gdp_pc_year') or '—'})"),
-                ("🌾 Қишлоқ хўжалиги", f"{format_float(extra_data.get('agriculture_pct'), '%')} ({extra_data.get('agriculture_year') or '—'})"),
-                ("🏭 Саноат", f"{format_float(extra_data.get('industry_pct'), '%')} ({extra_data.get('industry_year') or '—'})"),
-                ("🏢 Хизматлар", f"{format_float(extra_data.get('services_pct'), '%')} ({extra_data.get('services_year') or '—'})"),
-                ("📈 Инфляция", f"{format_float(extra_data.get('inflation_pct'), '%')} ({extra_data.get('inflation_year') or '—'})"),
-                ("❤️ Умр давомийлиги", f"{format_float(extra_data.get('life_expectancy'), ' йил')} ({extra_data.get('life_year') or '—'})"),
-                ("🏙️ Шаҳар аҳолиси", f"{format_float(extra_data.get('urban_population_pct'), '%')} ({extra_data.get('urban_year') or '—'})"),
+                ("🌾 Qishloq xo'jaligi", f"{format_float(extra_data.get('agriculture_pct'), '%')} ({extra_data.get('agriculture_year') or '—'})"),
+                ("🏭 Sanoat", f"{format_float(extra_data.get('industry_pct'), '%')} ({extra_data.get('industry_year') or '—'})"),
+                ("🏢 Xizmatlar", f"{format_float(extra_data.get('services_pct'), '%')} ({extra_data.get('services_year') or '—'})"),
+                ("📈 Inflatsiya", f"{format_float(extra_data.get('inflation_pct'), '%')} ({extra_data.get('inflation_year') or '—'})"),
+                ("❤️ Umr davomiyligi", f"{format_float(extra_data.get('life_expectancy'), ' yil')} ({extra_data.get('life_year') or '—'})"),
+                ("🏙️ Shahar aholisi", f"{format_float(extra_data.get('urban_population_pct'), '%')} ({extra_data.get('urban_year') or '—'})"),
             ]
 
-            econ_html = '<div class="info-card"><h3>📊 ИҚТИСОДИЙ СТАТИСТИКА</h3>'
+            econ_html = '<div class="info-card"><h3>📊 IQTISODIY STATISTIKA</h3>'
             for label, value in economy_details:
                 if value and value != "—":
                     econ_html += f"""
@@ -804,7 +804,7 @@ with tab2:
     st.markdown("""
     <div style='font-family: Orbitron, monospace; font-size: 1.2rem; color: #00d4ff;
                 letter-spacing: 2px; margin-bottom: 1rem;'>
-        📊 РЕГИОНЛАР СТАТИСТИКАСИ
+        📊 REGIONLAR STATISTIKASI
     </div>
     """, unsafe_allow_html=True)
     
@@ -813,18 +813,18 @@ with tab2:
         "area": "sum",
         "name": "count"
     }).round(2).reset_index()
-    region_stats.columns = ["Регион", "Аҳоли", "Майдон (км²)", "Давлатлар сони"]
-    region_stats["Аҳоли"] = region_stats["Аҳоли"].apply(format_number)
-    region_stats["Майдон (км²)"] = region_stats["Майдон (км²)"].apply(lambda x: f"{x:,.0f}")
+    region_stats.columns = ["Region", "Aholi", "Maydon (km²)", "Davlatlar soni"]
+    region_stats["Aholi"] = region_stats["Aholi"].apply(format_number)
+    region_stats["Maydon (km²)"] = region_stats["Maydon (km²)"].apply(lambda x: f"{x:,.0f}")
     
     st.dataframe(region_stats, use_container_width=True)
     
     fig_bar = px.bar(
         region_stats,
-        x="Регион",
-        y="Давлатлар сони",
-        title="РЕГИОНЛАР БЎЙИЧА ДАВЛАТЛАР СОНИ",
-        color="Давлатлар сони",
+        x="Region",
+        y="Davlatlar soni",
+        title="REGIONLAR BO'YICHA DAVLATLAR SONI",
+        color="Davlatlar soni",
         color_continuous_scale="Viridis"
     )
     fig_bar.update_layout(
