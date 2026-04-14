@@ -173,13 +173,13 @@ html, body, [class*="css"] {
 """, unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────
-#  COMPLETE COUNTRIES DATABASE (195 DAVLAT)
+#  COMPLETE COUNTRIES DATABASE (40+ DAVLAT)
 # ─────────────────────────────────────────────
 @st.cache_data(show_spinner=False, ttl=60 * 60 * 12)
 def get_all_countries():
-    """REST Countries orqali 195 ta davlat ma'lumotini yuklaydi."""
+    """195 ta davlatni REST Countries orqali olib keladi."""
 
-    un_195 = {
+    UN_195 = {
         "AFG","ALB","DZA","AND","AGO","ATG","ARG","ARM","AUS","AUT","AZE",
         "BHS","BHR","BGD","BRB","BLR","BEL","BLZ","BEN","BTN","BOL","BIH",
         "BWA","BRA","BRN","BGR","BFA","BDI","CPV","KHM","CMR","CAN","CAF",
@@ -200,261 +200,137 @@ def get_all_countries():
         "VUT","VEN","VNM","YEM","ZMB","ZWE","VAT","PSE"
     }
 
-    region_uz = {
+    REGION_UZ = {
         "Africa": "Afrika",
         "Americas": "Amerika",
         "Asia": "Osiyo",
         "Europe": "Yevropa",
         "Oceania": "Okeaniya",
-        "Antarctic": "Antarktida",
+        "Antarctic": "Antarktida"
     }
 
-    name_uz = {
-        "Afghanistan": "Afg'oniston",
-        "Albania": "Albaniya",
-        "Algeria": "Jazoir",
-        "Andorra": "Andorra",
-        "Angola": "Angola",
-        "Antigua and Barbuda": "Antigua va Barbuda",
-        "Argentina": "Argentina",
-        "Armenia": "Armaniston",
-        "Australia": "Avstraliya",
-        "Austria": "Avstriya",
-        "Azerbaijan": "Ozarbayjon",
-        "Bahamas": "Bagama orollari",
-        "Bahrain": "Bahrayn",
-        "Bangladesh": "Bangladesh",
-        "Barbados": "Barbados",
-        "Belarus": "Belarus",
-        "Belgium": "Belgiya",
-        "Belize": "Beliz",
-        "Benin": "Benin",
-        "Bhutan": "Butan",
-        "Bolivia": "Boliviya",
-        "Bosnia and Herzegovina": "Bosniya va Gertsegovina",
-        "Botswana": "Botsvana",
-        "Brazil": "Braziliya",
-        "Brunei": "Bruney",
-        "Bulgaria": "Bolgariya",
-        "Burkina Faso": "Burkina-Faso",
-        "Burundi": "Burundi",
-        "Cabo Verde": "Kabo-Verde",
-        "Cambodia": "Kambodja",
-        "Cameroon": "Kamerun",
-        "Canada": "Kanada",
-        "Central African Republic": "Markaziy Afrika Respublikasi",
-        "Chad": "Chad",
-        "Chile": "Chili",
-        "China": "Xitoy",
-        "Colombia": "Kolumbiya",
-        "Comoros": "Komor orollari",
-        "Congo": "Kongo",
-        "Costa Rica": "Kosta-Rika",
-        "Croatia": "Xorvatiya",
-        "Cuba": "Kuba",
-        "Cyprus": "Kipr",
-        "Czechia": "Chexiya",
-        "Democratic Republic of the Congo": "Kongo Demokratik Respublikasi",
-        "Denmark": "Daniya",
-        "Djibouti": "Jibuti",
-        "Dominica": "Dominika",
-        "Dominican Republic": "Dominikan Respublikasi",
-        "Ecuador": "Ekvador",
-        "Egypt": "Misr",
-        "El Salvador": "Salvador",
-        "Equatorial Guinea": "Ekvatorial Gvineya",
-        "Eritrea": "Eritreya",
-        "Estonia": "Estoniya",
-        "Eswatini": "Esvatini",
-        "Ethiopia": "Efiopiya",
-        "Fiji": "Fiji",
-        "Finland": "Finlandiya",
-        "France": "Fransiya",
-        "Gabon": "Gabon",
-        "Gambia": "Gambiya",
-        "Georgia": "Gruziya",
-        "Germany": "Germaniya",
-        "Ghana": "Gana",
-        "Greece": "Gretsiya",
-        "Grenada": "Grenada",
-        "Guatemala": "Gvatemala",
-        "Guinea": "Gvineya",
-        "Guinea-Bissau": "Gvineya-Bisau",
-        "Guyana": "Gayana",
-        "Haiti": "Gaiti",
-        "Honduras": "Gonduras",
-        "Hungary": "Vengriya",
-        "Iceland": "Islandiya",
-        "India": "Hindiston",
-        "Indonesia": "Indoneziya",
-        "Iran": "Eron",
-        "Iraq": "Iroq",
-        "Ireland": "Irlandiya",
-        "Israel": "Isroil",
-        "Italy": "Italiya",
-        "Jamaica": "Yamayka",
-        "Japan": "Yaponiya",
-        "Jordan": "Iordaniya",
-        "Kazakhstan": "Qozog'iston",
-        "Kenya": "Keniya",
-        "Kiribati": "Kiribati",
-        "North Korea": "Shimoliy Koreya",
-        "South Korea": "Janubiy Koreya",
-        "Kuwait": "Quvayt",
-        "Kyrgyzstan": "Qirg'iziston",
-        "Laos": "Laos",
-        "Latvia": "Latviya",
-        "Lebanon": "Livan",
-        "Lesotho": "Lesoto",
-        "Liberia": "Liberiya",
-        "Libya": "Liviya",
-        "Liechtenstein": "Lixtenshteyn",
-        "Lithuania": "Litva",
-        "Luxembourg": "Lyuksemburg",
-        "Madagascar": "Madagaskar",
-        "Malawi": "Malavi",
-        "Malaysia": "Malayziya",
-        "Maldives": "Maldiv",
-        "Mali": "Mali",
-        "Malta": "Malta",
-        "Marshall Islands": "Marshall orollari",
-        "Mauritania": "Mavritaniya",
-        "Mauritius": "Mavrikiy",
-        "Mexico": "Meksika",
-        "Micronesia": "Mikroneziya",
-        "Moldova": "Moldova",
-        "Monaco": "Monako",
-        "Mongolia": "Mo'g'uliston",
-        "Montenegro": "Chernogoriya",
-        "Morocco": "Marokash",
-        "Mozambique": "Mozambik",
-        "Myanmar": "Myanma",
-        "Namibia": "Namibiya",
-        "Nauru": "Nauru",
-        "Nepal": "Nepal",
-        "Netherlands": "Niderlandiya",
-        "New Zealand": "Yangi Zelandiya",
-        "Nicaragua": "Nikaragua",
-        "Niger": "Niger",
-        "Nigeria": "Nigeriya",
-        "North Macedonia": "Shimoliy Makedoniya",
-        "Norway": "Norvegiya",
-        "Oman": "Ummon",
-        "Pakistan": "Pokiston",
-        "Palau": "Palau",
-        "Panama": "Panama",
-        "Papua New Guinea": "Papua-Yangi Gvineya",
-        "Paraguay": "Paragvay",
-        "Peru": "Peru",
-        "Philippines": "Filippin",
-        "Poland": "Polsha",
-        "Portugal": "Portugaliya",
-        "Qatar": "Qatar",
-        "Romania": "Ruminiya",
-        "Russia": "Rossiya",
-        "Rwanda": "Ruanda",
-        "Saint Kitts and Nevis": "Sent-Kits va Nevis",
-        "Saint Lucia": "Sent-Lyusiya",
-        "Saint Vincent and the Grenadines": "Sent-Vinsent va Grenadin",
-        "Samoa": "Samoa",
-        "San Marino": "San-Marino",
-        "Sao Tome and Principe": "San-Tome va Prinsipi",
-        "Saudi Arabia": "Saudiya Arabistoni",
-        "Senegal": "Senegal",
-        "Serbia": "Serbiya",
-        "Seychelles": "Seyshel",
-        "Sierra Leone": "Syerra-Leone",
-        "Singapore": "Singapur",
-        "Slovakia": "Slovakiya",
-        "Slovenia": "Sloveniya",
-        "Solomon Islands": "Solomon orollari",
-        "Somalia": "Somali",
-        "South Africa": "Janubiy Afrika",
-        "South Sudan": "Janubiy Sudan",
-        "Spain": "Ispaniya",
-        "Sri Lanka": "Shri-Lanka",
-        "Sudan": "Sudan",
-        "Suriname": "Surinam",
-        "Sweden": "Shvetsiya",
-        "Switzerland": "Shveytsariya",
-        "Syria": "Suriya",
-        "Tajikistan": "Tojikiston",
-        "Tanzania": "Tanzaniya",
-        "Thailand": "Tailand",
-        "Timor-Leste": "Sharqiy Timor",
-        "Togo": "Togo",
-        "Tonga": "Tonga",
-        "Trinidad and Tobago": "Trinidad va Tobago",
-        "Tunisia": "Tunis",
-        "Turkey": "Turkiya",
-        "Turkmenistan": "Turkmaniston",
-        "Tuvalu": "Tuvalu",
-        "Uganda": "Uganda",
-        "Ukraine": "Ukraina",
-        "United Arab Emirates": "Birlashgan Arab Amirliklari",
-        "United Kingdom": "Buyuk Britaniya",
+    NAME_UZ = {
         "United States": "AQSh",
-        "Uruguay": "Urugvay",
+        "United States of America": "AQSh",
+        "United Kingdom": "Buyuk Britaniya",
+        "Russia": "Rossiya",
+        "Germany": "Germaniya",
+        "France": "Fransiya",
+        "Italy": "Italiya",
+        "Spain": "Ispaniya",
+        "Japan": "Yaponiya",
+        "China": "Xitoy",
+        "India": "Hindiston",
+        "South Korea": "Janubiy Koreya",
+        "Korea": "Koreya",
+        "North Korea": "Shimoliy Koreya",
+        "Turkey": "Turkiya",
+        "Türkiye": "Turkiya",
+        "Iran": "Eron",
+        "Saudi Arabia": "Saudiya Arabistoni",
+        "United Arab Emirates": "Birlashgan Arab Amirliklari",
         "Uzbekistan": "O'zbekiston",
-        "Vanuatu": "Vanuatu",
-        "Vatican City": "Vatikan",
-        "Venezuela": "Venesuela",
-        "Vietnam": "Vyetnam",
-        "Yemen": "Yaman",
-        "Zambia": "Zambiya",
-        "Zimbabwe": "Zimbabve",
+        "Kazakhstan": "Qozog'iston",
+        "Kyrgyzstan": "Qirg'iziston",
+        "Tajikistan": "Tojikiston",
+        "Turkmenistan": "Turkmaniston",
+        "Egypt": "Misr",
+        "South Africa": "Janubiy Afrika",
+        "New Zealand": "Yangi Zelandiya",
+        "Czechia": "Chexiya",
+        "Netherlands": "Niderlandiya",
+        "Sweden": "Shvetsiya",
+        "Norway": "Norvegiya",
+        "Switzerland": "Shveytsariya",
+        "Belarus": "Belarus",
+        "Ukraine": "Ukraina",
+        "Poland": "Polsha",
+        "Mexico": "Meksika",
+        "Brazil": "Braziliya",
+        "Argentina": "Argentina",
+        "Canada": "Kanada",
+        "Australia": "Avstraliya",
+        "Pakistan": "Pokiston",
+        "Bangladesh": "Bangladesh",
+        "Indonesia": "Indoneziya",
+        "Afghanistan": "Afg'oniston",
+        "Iraq": "Iroq",
+        "Syria": "Suriya",
+        "Israel": "Isroil",
         "Palestine": "Falastin",
+        "Vatican City": "Vatikan",
+        "Holy See": "Vatikan",
     }
 
-    try:
-        url = (
-            "https://restcountries.com/v3.1/all"
-            "?fields=name,cca2,cca3,capital,region,subregion,population,area,"
-            "languages,currencies,timezones,borders,tld,landlocked,car,latlng,flag,independent"
-        )
+    def fetch_all_fields(fields):
+        url = f"https://restcountries.com/v3.1/all?fields={','.join(fields)}"
         response = requests.get(url, timeout=40)
         response.raise_for_status()
-        data = response.json()
+        return response.json()
+
+    try:
+        base_fields = [
+            "name", "cca2", "cca3", "capital", "region",
+            "subregion", "population", "area", "flag", "independent"
+        ]
+        extra_fields = [
+            "cca3", "languages", "currencies", "timezones", "borders",
+            "tld", "landlocked", "car", "latlng"
+        ]
+
+        base_data = fetch_all_fields(base_fields)
+        extra_data = fetch_all_fields(extra_fields)
+        extra_map = {
+            item.get("cca3", ""): item
+            for item in extra_data
+            if item.get("cca3")
+        }
 
         rows = []
-        for c in data:
+        for c in base_data:
             cca3 = c.get("cca3", "")
-            if cca3 not in un_195:
+            if cca3 not in UN_195:
                 continue
+
+            extra = extra_map.get(cca3, {})
 
             common_name = c.get("name", {}).get("common", "Noma'lum")
             official_name = c.get("name", {}).get("official", common_name)
+            name_display = NAME_UZ.get(common_name, common_name)
+
             capital = c.get("capital", ["—"])
             capital = capital[0] if capital else "—"
 
-            languages = c.get("languages", {})
-            currencies = c.get("currencies", {})
-            timezones = c.get("timezones", [])
-            borders = c.get("borders", [])
-            tld = c.get("tld", [])
-            latlng = c.get("latlng", [0, 0])
-            car = c.get("car", {})
+            languages = extra.get("languages", {})
+            currencies = extra.get("currencies", {})
+            timezones = extra.get("timezones", [])
+            borders = extra.get("borders", [])
+            tld = extra.get("tld", [])
+            latlng = extra.get("latlng", [0, 0])
+            car = extra.get("car", {})
+
             region_raw = c.get("region", "—")
+            region_uz = REGION_UZ.get(region_raw, region_raw if region_raw else "—")
 
             rows.append({
-                "name": name_uz.get(common_name, common_name),
+                "name": name_display,
                 "official": official_name,
                 "cca2": c.get("cca2", ""),
                 "cca3": cca3,
                 "flag": c.get("flag", "🏳️"),
                 "capital": capital,
-                "region": region_uz.get(region_raw, region_raw if region_raw else "—"),
+                "region": region_uz,
                 "subregion": c.get("subregion", "—") or "—",
                 "population": int(c.get("population", 0) or 0),
                 "area": float(c.get("area", 0) or 0),
                 "languages": ", ".join(languages.values()) if languages else "—",
                 "currencies": ", ".join(
-                    f"{v.get('name', k)} ({k})" for k, v in currencies.items()
+                    [f"{v.get('name', k)} ({k})" for k, v in currencies.items()]
                 ) if currencies else "—",
                 "timezones": ", ".join(timezones) if timezones else "—",
                 "borders": ", ".join(borders) if borders else "Dengizga chegaralangan",
                 "tld": ", ".join(tld) if tld else "—",
-                "landlocked": "Ha" if c.get("landlocked", False) else "Yo'q",
+                "landlocked": "Ha" if extra.get("landlocked", False) else "Yo'q",
                 "independent": "Ha" if c.get("independent", True) else "Yo'q",
                 "car_side": car.get("side", "—").capitalize() if car.get("side") else "—",
                 "lat": latlng[0] if isinstance(latlng, list) and len(latlng) > 0 else 0,
@@ -539,20 +415,6 @@ COUNTRY_NAME_EN_MAP = {
     "Yangi Zelandiya": "New Zealand",
 }
 
-
-@st.cache_data(show_spinner=False, ttl=60 * 60 * 12)
-def fetch_country_common_name(cca2):
-    try:
-        url = f"https://restcountries.com/v3.1/alpha/{cca2}"
-        response = requests.get(url, timeout=20)
-        response.raise_for_status()
-        data = response.json()
-        if isinstance(data, list) and data:
-            return data[0].get("name", {}).get("common")
-    except Exception:
-        return None
-    return None
-
 @st.cache_data(show_spinner=False, ttl=60 * 60 * 12)
 def fetch_flag_url(cca2):
     try:
@@ -619,9 +481,9 @@ def fetch_head_of_state(country_name_en):
 
 @st.cache_data(show_spinner=False, ttl=60 * 60 * 12)
 def get_country_extra_data(cca2, cca3, name_uz):
-    country_name_en = COUNTRY_NAME_EN_MAP.get(name_uz)
-    if not country_name_en:
-        country_name_en = fetch_country_common_name(cca2) or name_uz
+    country_name_en = COUNTRY_NAME_EN_MAP.get(name_uz, name_uz)
+    if country_name_en == name_uz:
+        country_name_en = name_uz
 
     flag_url = fetch_flag_url(cca2)
     president = fetch_head_of_state(country_name_en)
