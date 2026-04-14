@@ -127,10 +127,8 @@ requests>=2.31.0
 
 ## 📸 Screenshot
 
-Bu bo'limga keyin GitHub uchun screenshot qo'shishingiz mumkin:
-
 ```md
-![World Explorer Pro Screenshot](screenshot.png)
+![Screenshot](./assets/screenshot.png)
 ```
 
 ## README uchun qisqa GitHub description
