@@ -133,14 +133,6 @@ Bu bo'limga keyin GitHub uchun screenshot qo'shishingiz mumkin:
 ![World Explorer Pro Screenshot](screenshot.png)
 ```
 
-## 🙌 Muallif
-
-**Azamat Madrimov**
-
-Agar loyiha yoqqan bo'lsa, repository'ga ⭐ berishni unutmang.
-
----
-
 ## README uchun qisqa GitHub description
 
 Repository description uchun qisqa matn:
