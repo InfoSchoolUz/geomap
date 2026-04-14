@@ -174,9 +174,14 @@ html, body, [class*="css"] {
 @st.cache_data(ttl=3600, show_spinner=False)
 def load_countries():
     """REST Countries API dan barcha davlatlar ma'lumotini olish"""
+    headers = {
+        "User-Agent": "Mozilla/5.0 (WorldExplorer/1.0)",
+        "Accept": "application/json",
+    }
     try:
-        url = "https://restcountries.com/v3.1/all?fields=name,flags,capital,region,subregion,population,area,languages,currencies,timezones,borders,latlng,tld,cca2,cca3,independent,landlocked,continents,car,coatOfArms"
-        r = requests.get(url, timeout=15)
+        # fields parametrisiz — to'liq ma'lumot olamiz
+        url = "https://restcountries.com/v3.1/all"
+        r = requests.get(url, headers=headers, timeout=20)
         r.raise_for_status()
         data = r.json()
 
@@ -243,8 +248,53 @@ def load_countries():
 
         return pd.DataFrame(rows)
     except Exception as e:
-        st.error(f"API xatosi: {e}")
-        return pd.DataFrame()
+        # v2 API ga fallback
+        try:
+            url2 = "https://restcountries.com/v2/all"
+            r2 = requests.get(url2, headers=headers, timeout=20)
+            r2.raise_for_status()
+            data2 = r2.json()
+            rows = []
+            for c in data2:
+                try:
+                    latlng = c.get("latlng", [0, 0])
+                    langs = c.get("languages", [])
+                    languages = ", ".join(l.get("name", "") for l in langs) if langs else "—"
+                    curr = c.get("currencies", [])
+                    currencies = ", ".join(
+                        f"{cu.get('name','')} ({cu.get('symbol','')})" for cu in curr
+                    ) if curr else "—"
+                    rows.append({
+                        "name": c.get("name", "Unknown"),
+                        "official": c.get("name", "Unknown"),
+                        "cca2": c.get("alpha2Code", ""),
+                        "cca3": c.get("alpha3Code", ""),
+                        "flag": "🏳️",
+                        "capital": c.get("capital", "—") or "—",
+                        "region": c.get("region", "Unknown") or "Unknown",
+                        "subregion": c.get("subregion", "—") or "—",
+                        "continents": c.get("region", "—"),
+                        "population": c.get("population", 0),
+                        "area": c.get("area", 0) or 0,
+                        "languages": languages,
+                        "currencies": currencies,
+                        "timezones": ", ".join(c.get("timezones", [])),
+                        "borders_list": c.get("borders", []),
+                        "borders": ", ".join(c.get("borders", [])) or "Dengizga chegaralangan",
+                        "tld": ", ".join(c.get("topLevelDomain", [])),
+                        "landlocked": "—",
+                        "independent": "—",
+                        "car_side": "—",
+                        "lat": latlng[0] if len(latlng) > 0 else 0,
+                        "lon": latlng[1] if len(latlng) > 1 else 0,
+                    })
+                except Exception:
+                    continue
+            st.warning("⚠️ v3.1 API ishlamadi — v2 API ishlatilmoqda (ba'zi ma'lumotlar cheklangan)")
+            return pd.DataFrame(rows)
+        except Exception as e2:
+            st.error(f"Ikkala API ham ishlamadi: {e} | {e2}")
+            return pd.DataFrame()
 
 
 def format_number(n):
